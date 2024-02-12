@@ -26,6 +26,7 @@ const TareaUpdate = ({ initialData, setOpen, id, setReload }) => {
     setValue,
     control,
     getValues,
+    setError,
     formState: { errors },
   } = useForm();
   const tareaHook = TareaHook();
@@ -98,23 +99,30 @@ const TareaUpdate = ({ initialData, setOpen, id, setReload }) => {
   };
   const addComentario = () => {
     let content = getValues('comentario');
-    comentarioHook
-      .create({
-        contenido: content,
-        usuarioId: logged?.id,
-        tareaId: initialData?.id,
-      })
-      .then(({ status }) => {
-        if (status) {
-          setValue('descripcion', null);
-          setOpenComentario(false);
-          setReload((prev) => !prev);
-          setRefresh((prev) => !prev);
-        }
-      })
-      .catch((error) => {
-        setMessage(error.response.data.message);
+    if (content != '') {
+      comentarioHook
+        .create({
+          contenido: content,
+          usuarioId: logged?.id,
+          tareaId: initialData?.id,
+        })
+        .then(({ status }) => {
+          if (status) {
+            setValue('comentario', '');
+            setOpenComentario(false);
+            setReload((prev) => !prev);
+            setRefresh((prev) => !prev);
+          }
+        })
+        .catch((error) => {
+          setMessage(error.response.data.message);
+        });
+    } else {
+      setError('comentario', {
+        type: 'custom',
+        message: 'Este campo es requerido',
       });
+    }
   };
   const removeComentario = (id) => {
     comentarioHook

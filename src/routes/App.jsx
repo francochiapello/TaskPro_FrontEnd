@@ -12,6 +12,7 @@ import ProyectoUpdate from '../pages/proyecto/ProyectoUpdate';
 import ProyectoDelete from '../pages/proyecto/ProyectoDelete';
 import ProyectoDetail from '../pages/proyecto/ProyectoDetail';
 import TareaList from '../pages/tarea/TareaList';
+import TareaDetail from '../pages/tarea/TareaDetail';
 
 function App() {
   return (
@@ -106,6 +107,17 @@ function App() {
               <ProtectLink>
                 <Layout>
                   <TareaList />
+                </Layout>
+              </ProtectLink>
+            }
+          />
+          <Route
+            exact
+            path='/tarea/detail/:id'
+            element={
+              <ProtectLink>
+                <Layout>
+                  <TareaDetail />
                 </Layout>
               </ProtectLink>
             }

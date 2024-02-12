@@ -8,7 +8,7 @@ const TareaHook = () => {
   const token = getCookie();
 
   const getAll = async () => {
-    const response = axios.get(`${config.URL}/GetAll`, {
+    const response = axios.get(`${url}/GetAll`, {
       headers: { Authorization: `Bearer ${token}` },
     });
 
@@ -38,7 +38,7 @@ const TareaHook = () => {
     });
   };
   const getOne = async (id) => {
-    const response = axios.get(`${config.URL}/${id}`, {
+    const response = axios.get(`${url}/${id}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
 

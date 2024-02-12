@@ -21,6 +21,8 @@ import UsuarioHook from '../../hooks/Usuario.hook';
 import { useNavigate, useParams } from 'react-router-dom';
 import TareaCreate from '../tarea/TareaCreate';
 import DataTable from 'react-data-table-component';
+import TareaUpdate from '../tarea/TareaUpdate';
+import TareaDelete from '../tarea/TareaDelete';
 
 const ProyectoDetail = () => {
   const proyectoHook = ProyectoHook();
@@ -33,6 +35,8 @@ const ProyectoDetail = () => {
   const [open, setOpen] = useState(false);
   const [list, setList] = useState([]);
   const [reload, setReload] = useState(false);
+  const [page, setPage] = useState('create');
+  const [initialData, setInitalData] = useState(null);
 
   const getProyectById = () => {
     proyectoHook
@@ -61,11 +65,12 @@ const ProyectoDetail = () => {
   useEffect(() => {
     getProyectById();
     getTareasByProyectId();
-  }, [open]);
+  }, [reload]);
 
   const addTarea = () => {};
 
   const handleClick = () => {
+    setPage('create');
     setOpen(true);
   };
 
@@ -116,11 +121,37 @@ const ProyectoDetail = () => {
             onClose={() => {
               setOpen(false);
             }}
-            title='Agregar Tarea'
           >
-            <DialogTitle>Agregar Tarea</DialogTitle>
+            <DialogTitle>
+              {page == 'create' && 'Agregar Tarea'}
+              {page == 'update' && 'Actualizar Tarea'}
+              {page == 'delete' &&
+                '¿Estas seguro que quieres eliminar esta tarea?'}
+            </DialogTitle>
             <DialogContent>
-              <TareaCreate setOpen={setOpen} id={params.id} />
+              {page == 'create' && (
+                <TareaCreate
+                  setOpen={setOpen}
+                  id={params.id}
+                  setReload={setReload}
+                />
+              )}
+              {page == 'update' && (
+                <TareaUpdate
+                  initialData={initialData}
+                  setOpen={setOpen}
+                  setReload={setReload}
+                  id={params.id}
+                />
+              )}
+              {page == 'delete' && (
+                <TareaDelete
+                  initialData={initialData}
+                  setOpen={setOpen}
+                  setReload={setReload}
+                  id={params.id}
+                />
+              )}
             </DialogContent>
           </Dialog>
         </React.Fragment>
@@ -155,11 +186,27 @@ const ProyectoDetail = () => {
                   cell: (row) => {
                     return (
                       <>
-                        <Tooltip title='Editar Proyecto'>
-                          <Edit />
+                        <Tooltip title='Editar Tarea'>
+                          <Button
+                            onClick={() => {
+                              setInitalData(row);
+                              setPage('update');
+                              setOpen(true);
+                            }}
+                          >
+                            <Edit />
+                          </Button>
                         </Tooltip>
-                        <Tooltip title='Eliminar Proyecto'>
-                          <Delete />
+                        <Tooltip title='Eliminar Tarea'>
+                          <Button
+                            onClick={() => {
+                              setInitalData(row);
+                              setPage('delete');
+                              setOpen(true);
+                            }}
+                          >
+                            <Delete />
+                          </Button>
                         </Tooltip>
                       </>
                     );

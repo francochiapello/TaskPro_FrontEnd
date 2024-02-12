@@ -11,6 +11,7 @@ import ProyectoCreate from '../pages/proyecto/ProyectoCreate';
 import ProyectoUpdate from '../pages/proyecto/ProyectoUpdate';
 import ProyectoDelete from '../pages/proyecto/ProyectoDelete';
 import ProyectoDetail from '../pages/proyecto/ProyectoDetail';
+import TareaList from '../pages/tarea/TareaList';
 
 function App() {
   return (
@@ -94,6 +95,17 @@ function App() {
               <ProtectLink>
                 <Layout>
                   <ProyectoDelete />
+                </Layout>
+              </ProtectLink>
+            }
+          />
+          <Route
+            exact
+            path='/tarea'
+            element={
+              <ProtectLink>
+                <Layout>
+                  <TareaList />
                 </Layout>
               </ProtectLink>
             }

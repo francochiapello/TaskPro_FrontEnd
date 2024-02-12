@@ -18,7 +18,7 @@ import UsuarioHook from '../../hooks/Usuario.hook';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-const TareaCreate = ({ setOpen, id }) => {
+const TareaCreate = ({ setOpen, id, setReload }) => {
   const {
     register,
     handleSubmit,
@@ -52,6 +52,7 @@ const TareaCreate = ({ setOpen, id }) => {
       })
       .then((value) => {
         if (value.status == 201) {
+          setReload((prev) => !prev);
           setOpen(false);
         }
       })

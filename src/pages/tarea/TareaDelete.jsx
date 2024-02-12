@@ -19,7 +19,7 @@ import ComentarioHook from '../../hooks/Comentario.hook';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-const TareaUpdate = ({ initialData, setOpen, id, setReload }) => {
+const TareaDelete = ({ initialData, setOpen, id, setReload }) => {
   const {
     register,
     handleSubmit,
@@ -34,20 +34,7 @@ const TareaUpdate = ({ initialData, setOpen, id, setReload }) => {
   const [message, setMessage] = useState(null);
   const [list, setList] = useState([]);
   const [logged, setLogged] = useState(null);
-  const [openComentario, setOpenComentario] = useState(false);
-  const [refresh, setRefresh] = useState(false);
-  const [tarea, setTarea] = useState(null);
 
-  const getTareaById = () => {
-    tareaHook
-      .getOne(initialData?.id)
-      .then(({ status, data }) => {
-        if (status == 200) {
-          setTarea(data);
-        }
-      })
-      .catch((error) => setMessage(error.response.data.message));
-  };
   const getListUsuarios = () => {
     usuarioHook
       .getAllSimpleList()
@@ -80,79 +67,37 @@ const TareaUpdate = ({ initialData, setOpen, id, setReload }) => {
       setValue('estado', initialData.estado);
     }
   };
-  const onSubmit = (data) => {
+  const handleClick = () => {
+    setOpen(false);
+  };
+  useEffect(() => {
+    setFormData();
+    getListUsuarios();
+    getUserLogged();
+  }, []);
+  const onSubmit = () => {
     tareaHook
-      .update(initialData?.id, {
-        proyectoId: id,
-        ...data,
-      })
-      .then((value) => {
-        if (value.status == 200) {
-          setReload((prev) => !prev);
-          setOpen(false);
-        }
-      })
-      .catch((error) => {
-        setMessage(error.response.data.message);
-      });
-  };
-  const addComentario = () => {
-    let content = getValues('comentario');
-    comentarioHook
-      .create({
-        contenido: content,
-        usuarioId: logged?.id,
-        tareaId: initialData?.id,
-      })
-      .then(({ status }) => {
-        if (status) {
-          setValue('descripcion', null);
-          setOpenComentario(false);
-          setReload((prev) => !prev);
-          setRefresh((prev) => !prev);
-        }
-      })
-      .catch((error) => {
-        setMessage(error.response.data.message);
-      });
-  };
-  const removeComentario = (id) => {
-    comentarioHook
-      .remove(id)
+      .remove(initialData?.id)
       .then(({ status }) => {
         if (status == 200) {
-          setRefresh((prev) => !prev);
+          setOpen(false);
           setReload((prev) => !prev);
         }
       })
       .catch((error) => setMessage(error.response.data.message));
   };
-  useEffect(() => {
-    getListUsuarios();
-    setFormData();
-    getUserLogged();
-    getTareaById();
-  }, [refresh]);
-
-  const handleClick = () => {};
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       {message != null && <Alert severity='error'>{message}</Alert>}
       <Box className='col-md-5' sx={{ marginTop: '1rem' }}>
         <TextField
-          {...register('nombre', {
-            required: {
-              value: true,
-              message: 'El nombre es requerida',
-            },
-            maxLength: {
-              value: 120,
-              message: 'El nombre no puede ser mayor a 120 carracteres',
-            },
-          })}
+          {...register('nombre', {})}
           InputLabelProps={{
             shrink: true,
+          }}
+          InputProps={{
+            readOnly: true,
           }}
           fullWidth
           required
@@ -164,14 +109,12 @@ const TareaUpdate = ({ initialData, setOpen, id, setReload }) => {
       </Box>
       <Box className='col-md-5' sx={{ marginTop: '1rem' }}>
         <TextField
-          {...register('descripcion', {
-            maxLength: {
-              value: 300,
-              message: 'La descripción no puede ser mayor a 300 carracteres',
-            },
-          })}
+          {...register('descripcion', {})}
           InputLabelProps={{
             shrink: true,
+          }}
+          InputProps={{
+            readOnly: true,
           }}
           fullWidth
           label='Descripción'
@@ -194,6 +137,7 @@ const TareaUpdate = ({ initialData, setOpen, id, setReload }) => {
               const { onChange, value } = field;
               return (
                 <Autocomplete
+                  readOnly={true}
                   disablePortal
                   options={list}
                   isOptionEqualToValue={(option, value) =>
@@ -228,18 +172,12 @@ const TareaUpdate = ({ initialData, setOpen, id, setReload }) => {
         </Box>
         <Box className='col-md-5' sx={{ marginTop: '2rem' }}>
           <TextField
-            {...register('estado', {
-              required: {
-                value: true,
-                message: 'El estado es requerido',
-              },
-              maxLength: {
-                value: 120,
-                message: 'El estado no puede ser mayor a 80 carracteres',
-              },
-            })}
+            {...register('estado', {})}
             InputLabelProps={{
               shrink: true,
+            }}
+            InputProps={{
+              readOnly: true,
             }}
             fullWidth
             required
@@ -257,64 +195,14 @@ const TareaUpdate = ({ initialData, setOpen, id, setReload }) => {
               Comentarios
             </Typography>
           }
-          action={
-            <>
-              <Tooltip title='Agregar Tarea'>
-                <Button
-                  onClick={() => {
-                    setOpenComentario(true);
-                  }}
-                  startIcon={<Add />}
-                  className='black'
-                >
-                  Agregar
-                </Button>
-              </Tooltip>
-            </>
-          }
         />
         <CardContent>
-          {openComentario && (
-            <Box>
-              <Box className='col-md-5'>
-                <TextField
-                  {...register('comentario', {
-                    maxLength: {
-                      value: 300,
-                      message:
-                        'El comentario no puede ser mayor a 300 carracteres',
-                    },
-                  })}
-                  InputLabelProps={{
-                    shrink: true,
-                  }}
-                  fullWidth
-                  label='Comentario'
-                  variant='outlined'
-                  multiline
-                  rows={3}
-                  error={errors.comentario && true}
-                  helperText={errors.comentario && errors.descripcion.message}
-                />
-              </Box>
-              <Box>
-                <Button
-                  onClick={() => {
-                    setOpenComentario(false);
-                  }}
-                >
-                  Cancelar
-                </Button>
-                <Button onClick={addComentario}>Guardar</Button>
-              </Box>
-            </Box>
-          )}
           <Box
             className='block overflow-auto'
             sx={{ marginTop: '1rem', maxHeight: '200px' }}
           >
-            {tarea != null &&
-              tarea.comentarios.map((val) => {
+            {initialData != null &&
+              initialData.comentarios.map((val) => {
                 return (
                   <Box
                     key={val.id}
@@ -324,18 +212,6 @@ const TareaUpdate = ({ initialData, setOpen, id, setReload }) => {
                     <span style={{ fontSize: '.7rem' }}>
                       {val.usuarioId == logged?.id ? 'Yo' : val.usuarioNombre}
                     </span>
-                    {val.usuarioId == logged?.id && (
-                      <Tooltip title='Eliminar mi Comentario'>
-                        <Button
-                          onClick={() => {
-                            removeComentario(val.id);
-                          }}
-                          sx={{ fontSize: '.5rem' }}
-                        >
-                          <Delete />
-                        </Button>
-                      </Tooltip>
-                    )}
                     <label className='form-control'>{val.contenido}</label>
                   </Box>
                 );
@@ -344,18 +220,13 @@ const TareaUpdate = ({ initialData, setOpen, id, setReload }) => {
         </CardContent>
       </Card>
       <Box sx={{ display: 'flex' }}>
-        <Button
-          onClick={() => {
-            setOpen(false);
-          }}
-          sx={{ marginLeft: 'auto' }}
-        >
-          Cerrar
+        <Button onClick={handleClick} sx={{ marginLeft: 'auto' }}>
+          No, Cerrar
         </Button>
-        <Button type='submit'>Guardar</Button>
+        <Button type='submit'>Si, Eliminar</Button>
       </Box>
     </form>
   );
 };
 
-export default TareaUpdate;
+export default TareaDelete;

@@ -1,5 +1,5 @@
-import React from 'react';
-import { Adb } from '@mui/icons-material';
+import React, { useEffect, useState } from 'react';
+import { Adb, Person } from '@mui/icons-material';
 import {
   AppBar,
   Box,
@@ -11,10 +11,30 @@ import {
 } from '@mui/material';
 import Cookie from '../services/Cookie.service';
 import { useNavigate } from 'react-router-dom';
+import UsuarioHook from '../hooks/Usuario.hook';
 
 const Layout = ({ children }) => {
+  const usuarioHook = UsuarioHook();
   const { remove, getCookie } = Cookie();
   const navigate = useNavigate();
+  const [user, setUser] = useState(null);
+
+  const getUserLogged = () => {
+    usuarioHook
+      .getProfile()
+      .then(({ status, data }) => {
+        if (status == 200) {
+          setUser(data);
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
+  useEffect(() => {
+    getUserLogged();
+  }, []);
 
   const handleCloseNavMenu = () => {};
   const handleExist = () => {
@@ -74,6 +94,16 @@ const Layout = ({ children }) => {
                 >
                   Proyectos
                 </Button>
+              )}
+            </Box>
+            <Box>
+              {user != null && (
+                <MenuItem>
+                  <Typography textAlign='center'>
+                    <Person />
+                    {user.nombre}
+                  </Typography>
+                </MenuItem>
               )}
             </Box>
             {getCookie() != null && (

@@ -36,8 +36,8 @@ const Register = () => {
   const onSubmit = (data) => {
     usuarioHook
       .register(data)
-      .then((value) => {
-        if (value.status == 200) {
+      .then(({ status }) => {
+        if (status == 200 || status == 201) {
           setMessage(null);
           navigate('/login');
         }

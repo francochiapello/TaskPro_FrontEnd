@@ -11,6 +11,7 @@ import {
 } from '@mui/material';
 import DataTable from 'react-data-table-component';
 import { useNavigate } from 'react-router-dom';
+import { ArrowBack } from '@mui/icons-material';
 
 const TareaList = () => {
   const tareaHook = TareaHook();
@@ -65,6 +66,16 @@ const TareaList = () => {
             Tareas Asignadas{' '}
             {logged == null ? '' : 'para ti, ' + logged?.nombre}
           </Typography>
+        }
+        action={
+          <Button
+            className='black'
+            onClick={handleClick}
+            title='Mis Proyectos'
+            startIcon={<ArrowBack />}
+          >
+            Mis Proyectos
+          </Button>
         }
       />
       <CardContent>
